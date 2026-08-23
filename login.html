@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — iMak</title>
+  <meta name="theme-color" content="#0B4D2C">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="logo-circle">iM</div>
+    <h1>iMak Business Enterprise</h1>
+  </header>
+
+  <main class="home-content">
+    <h2>Login</h2>
+    <p class="subtitle">Welcome back. Enter your details below.</p>
+
+    <div class="card">
+      <form id="login-form">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+
+        <p id="login-message" class="form-message"></p>
+
+        <button type="submit" class="btn-primary">Login</button>
+      </form>
+
+      <p class="switch-text">Don't have an account? <a href="register.html">Create one</a></p>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 iMak Business Enterprise — Demo Version</p>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

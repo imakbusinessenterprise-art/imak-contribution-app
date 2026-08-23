@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment — iMak</title>
+  <meta name="theme-color" content="#0B4D2C">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="logo-circle">iM</div>
+    <h1>iMak Business Enterprise</h1>
+  </header>
+
+  <main class="home-content">
+    <h2>Complete Payment</h2>
+    <p class="subtitle">This is a demo/test payment — no real money is transferred.</p>
+
+    <div class="card" id="payment-summary">
+      <p class="empty-text">Loading payment details...</p>
+    </div>
+
+    <div class="card">
+      <h3>Official Payment Details</h3>
+      <p class="bank-detail"><strong>Bank Name:</strong> <span id="bank-name">Demo Bank</span></p>
+      <p class="bank-detail"><strong>Account Name:</strong> <span id="account-name">iMak Business Enterprise (Demo)</span></p>
+      <p class="bank-detail"><strong>Account Number:</strong> <span id="account-number">0000000000</span></p>
+      <p class="bank-instructions" id="payment-instructions">This is a test payment environment. No real transfer is required — tap the button below to simulate a successful demo payment.</p>
+    </div>
+
+    <button id="simulate-payment-btn" class="btn-primary">Simulate Demo Payment</button>
+    <p id="payment-message" class="form-message"></p>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">Dashboard</a>
+    <a href="contributions.html" class="nav-item">Contribute</a>
+    <a href="payment.html" class="nav-item active">Payment</a>
+    <a href="withdrawal.html" class="nav-item">Withdraw</a>
+    <a href="profile.html" class="nav-item">Profile</a>
+  </nav>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/payment.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Withdraw — iMak</title>
+  <meta name="theme-color" content="#0B4D2C">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="logo-circle">iM</div>
+    <h1>iMak Business Enterprise</h1>
+  </header>
+
+  <main class="home-content">
+    <h2>Request a Withdrawal</h2>
+    <p class="subtitle" id="balance-subtitle">Loading your balance...</p>
+
+    <div class="card">
+      <form id="withdrawal-form">
+        <label for="w-amount">Withdrawal Amount (₦)</label>
+        <input type="number" id="w-amount" placeholder="Enter amount" required>
+
+        <label for="w-bank-name">Bank Name</label>
+        <input type="text" id="w-bank-name" placeholder="Enter your bank name" required>
+
+        <label for="w-account-name">Account Name</label>
+        <input type="text" id="w-account-name" placeholder="Enter account name" required>
+
+        <label for="w-account-number">Account Number</label>
+        <input type="text" id="w-account-number" placeholder="Enter account number" required>
+
+        <label for="w-reason">Reason (optional)</label>
+        <input type="text" id="w-reason" placeholder="Optional note">
+
+        <p id="withdrawal-message" class="form-message"></p>
+
+        <button type="submit" class="btn-primary">Submit Withdrawal Request</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Your Withdrawal History</h3>
+      <div id="withdrawal-history-list">
+        <p class="empty-text">Loading...</p>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">Dashboard</a>
+    <a href="contributions.html" class="nav-item">Contribute</a>
+    <a href="payment.html" class="nav-item">Payment</a>
+    <a href="withdrawal.html" class="nav-item active">Withdraw</a>
+    <a href="profile.html" class="nav-item">Profile</a>
+  </nav>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/withdrawal.js"></script>
+</body>
+</html>

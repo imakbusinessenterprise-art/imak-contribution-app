@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile — iMak</title>
+  <meta name="theme-color" content="#0B4D2C">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="logo-circle">iM</div>
+    <h1>iMak Business Enterprise</h1>
+  </header>
+
+  <main class="home-content">
+    <h2>My Profile</h2>
+    <p class="subtitle">View and update your account details.</p>
+
+    <div class="card">
+      <form id="profile-form">
+        <label for="p-fullName">Full Name</label>
+        <input type="text" id="p-fullName" required>
+
+        <label for="p-email">Email</label>
+        <input type="email" id="p-email" disabled>
+
+        <label for="p-phone">Phone Number</label>
+        <input type="tel" id="p-phone" required>
+
+        <label for="p-plan">Preferred Contribution Plan</label>
+        <select id="p-plan">
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
+        </select>
+
+        <label for="p-bank">Bank Name (for withdrawals)</label>
+        <input type="text" id="p-bank">
+
+        <label for="p-account-name">Account Name</label>
+        <input type="text" id="p-account-name">
+
+        <label for="p-account-number">Account Number</label>
+        <input type="text" id="p-account-number">
+
+        <p class="bank-detail" id="p-status-line"></p>
+        <p class="bank-detail" id="p-registered-line"></p>
+
+        <p id="profile-message" class="form-message"></p>
+
+        <button type="submit" class="btn-primary">Save Changes</button>
+      </form>
+    </div>
+
+    <button id="profile-logout-btn" class="btn-secondary logout-space">Logout</button>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">Dashboard</a>
+    <a href="contributions.html" class="nav-item">Contribute</a>
+    <a href="payment.html" class="nav-item">Payment</a>
+    <a href="withdrawal.html" class="nav-item">Withdraw</a>
+    <a href="profile.html" class="nav-item active">Profile</a>
+  </nav>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>
