@@ -1,1 +1,368 @@
 
+:root {
+  --color-primary: #0B4D2C;   /* dark green */
+  --color-secondary: #FFFFFF; /* white */
+  --color-accent: #D4AF37;    /* gold */
+  --color-text: #1A1A1A;
+  --color-bg: #F5F5F0;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.app-header {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.logo-circle {
+  background-color: var(--color-accent);
+  color: var(--color-primary);
+  font-weight: bold;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-header h1 {
+  font-size: 1.1rem;
+}
+
+.home-content {
+  padding: 24px 16px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.home-content h2 {
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #555;
+  margin-bottom: 24px;
+}
+
+.card {
+  background-color: var(--color-secondary);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.card h3 {
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.card p {
+  margin-bottom: 16px;
+  color: #444;
+}
+
+.btn-primary, .btn-secondary {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  border: none;
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+.app-footer {
+  text-align: center;
+  padding: 16px;
+  color: #777;
+  font-size: 0.8rem;
+}
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 4px;
+  margin-top: 12px;
+}
+
+form input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+form input:focus {
+  outline: 2px solid var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.form-message {
+  min-height: 20px;
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
+.switch-text {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.switch-text a {
+  color: var(--color-primary);
+  font-weight: bold;
+  text-decoration: none;
+}
+.balance-card {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.balance-label {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+.balance-amount {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-accent);
+  margin: 6px 0;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.plan-card {
+  background-color: var(--color-secondary);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.plan-name {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.plan-amount {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.empty-text {
+  color: #999;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.logout-space {
+  margin-top: 20px;
+  margin-bottom: 90px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--color-secondary);
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.nav-item {
+  color: #777;
+  text-decoration: none;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.nav-item.active {
+  color: var(--color-primary);
+  font-weight: bold;
+}
+.plan-select-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.plan-option {
+  background-color: var(--color-secondary);
+  border: 2px solid #ddd;
+  border-radius: var(--radius);
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plan-option-name {
+  font-weight: bold;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+}
+
+.plan-option-min {
+  font-size: 0.75rem;
+  color: #777;
+}
+
+.plan-option-selected {
+  border-color: var(--color-accent);
+  background-color: #FBF6E7;
+}
+
+.selected-plan-text {
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.history-row:last-child {
+  border-bottom: none;
+}
+
+.history-sub {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.history-amount {
+  text-align: right;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.history-status {
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #B8860B;
+}
+.bank-detail {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.bank-instructions {
+  font-size: 0.85rem;
+  color: #777;
+  margin-top: 12px;
+  font-style: italic;
+}
+.admin-withdrawal-row {
+  border-bottom: 1px solid #eee;
+  padding: 14px 0;
+}
+
+.admin-withdrawal-row:last-child {
+  border-bottom: none;
+}
+
+.admin-withdrawal-row p {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.admin-btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-approve, .btn-reject {
+  padding: 8px 14px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-approve {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-reject {
+  background-color: #B00020;
+  color: white;
+}
+form select {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background-color: white;
+}
+
+form input:disabled {
+  background-color: #f0f0f0;
+  color: #888;
+}
