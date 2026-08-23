@@ -1,0 +1,15 @@
+{
+  "name": "iMak Business Enterprise",
+  "short_name": "iMak",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#F5F5F0",
+  "theme_color": "#0B4D2C",
+  "icons": [
+    {
+      "src": "images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
