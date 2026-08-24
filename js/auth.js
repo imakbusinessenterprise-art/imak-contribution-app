@@ -14,12 +14,15 @@ if (registerForm) {
     message.textContent = "Creating your account...";
     message.style.color = "#555";
 
+    let newUser = null;
+
     auth.createUserWithEmailAndPassword(email, password)
       .then(function (userCredential) {
+        newUser = userCredential.user;
         const fullName = document.getElementById("fullName").value;
         const phone = document.getElementById("phone").value;
 
-        return db.collection("users").doc(userCredential.user.uid).set({
+        return db.collection("users").doc(newUser.uid).set({
           fullName: fullName,
           email: email,
           phone: phone,
@@ -29,7 +32,10 @@ if (registerForm) {
         });
       })
       .then(function () {
-        message.textContent = "Account created! You can now log in.";
+        return newUser.sendEmailVerification();
+      })
+      .then(function () {
+        message.textContent = "Account created! We've sent a verification link to your email — please verify before logging in.";
         message.style.color = "#0B4D2C";
       })
       .catch(function (error) {
@@ -69,11 +75,53 @@ const logoutBtn = document.getElementById("logout-btn");
 
 if (welcomeText) {
   auth.onAuthStateChanged(function (user) {
-    if (user) {
-      welcomeText.textContent = "Logged in as " + user.email;
-    } else {
+    if (!user) {
       window.location.href = "login.html";
+      return;
     }
+
+    if (!user.emailVerified) {
+      showVerifyReminder(user);
+      return;
+    }
+
+    welcomeText.textContent = "Logged in as " + user.email;
+  });
+}
+
+function showVerifyReminder(user) {
+  const mainEl = document.querySelector("main.home-content");
+  if (!mainEl) return;
+
+  mainEl.innerHTML =
+    "<h2>Verify Your Email</h2>" +
+    "<p class='subtitle'>Please verify " + user.email + " before using your account. Check your inbox (and spam folder) for the link.</p>" +
+    "<button id='resend-verify-btn' class='btn-primary'>Resend Verification Email</button>" +
+    "<button id='verify-check-btn' class='btn-secondary'>I've Verified — Refresh</button>" +
+    "<p id='verify-message' class='form-message'></p>" +
+    "<button id='verify-logout-btn' class='btn-secondary logout-space'>Logout</button>";
+
+  document.getElementById("resend-verify-btn").addEventListener("click", function () {
+    const msg = document.getElementById("verify-message");
+    user.sendEmailVerification().then(function () {
+      msg.textContent = "Verification email sent again — check your inbox.";
+      msg.style.color = "#0B4D2C";
+    }).catch(function (error) {
+      msg.textContent = error.message;
+      msg.style.color = "#B00020";
+    });
+  });
+
+  document.getElementById("verify-check-btn").addEventListener("click", function () {
+    user.reload().then(function () {
+      window.location.reload();
+    });
+  });
+
+  document.getElementById("verify-logout-btn").addEventListener("click", function () {
+    auth.signOut().then(function () {
+      window.location.href = "login.html";
+    });
   });
 }
 
@@ -83,4 +131,4 @@ if (logoutBtn) {
       window.location.href = "login.html";
     });
   });
-          }
+}
