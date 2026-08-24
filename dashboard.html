@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contribute — iMak</title>
+  <title>Dashboard — iMak</title>
   <meta name="theme-color" content="#0B4D2C">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/style.css">
@@ -16,37 +16,47 @@
   </header>
 
   <main class="home-content">
-    <h2>Make a Contribution</h2>
-    <p class="subtitle">Choose a plan and enter your amount.</p>
+    <p class="subtitle" id="welcome-text">Loading...</p>
 
-    <div class="plan-select-grid" id="plan-select-grid">
-      <p class="empty-text">Loading plans...</p>
+    <div class="balance-card">
+      <p class="balance-label">Current Balance</p>
+      <p class="balance-amount" id="balance-amount">₦0.00</p>
+      <p class="balance-label" id="total-contributions">Total Contributions: ₦0.00</p>
+    </div>
+
+    <div class="plan-grid">
+      <div class="plan-card">
+        <p class="plan-name">Daily Plan</p>
+        <p class="plan-amount">₦500 min</p>
+      </div>
+      <div class="plan-card">
+        <p class="plan-name">Weekly Plan</p>
+        <p class="plan-amount">₦2,000 min</p>
+      </div>
+      <div class="plan-card">
+        <p class="plan-name">Monthly Plan</p>
+        <p class="plan-amount">₦5,000 min</p>
+      </div>
+      <div class="plan-card">
+        <p class="plan-name">Pending Withdrawal</p>
+        <p class="plan-amount">₦0.00</p>
+      </div>
     </div>
 
     <div class="card">
-      <form id="contribution-form">
-        <p class="selected-plan-text" id="selected-plan-text">No plan selected yet.</p>
-
-        <label for="amount">Amount (₦)</label>
-        <input type="number" id="amount" placeholder="Enter amount" required>
-
-        <p id="contribution-message" class="form-message"></p>
-
-        <button type="submit" class="btn-primary">Continue to Payment</button>
-      </form>
-    </div>
-
-    <div class="card">
-      <h3>Your Contribution History</h3>
-      <div id="history-list">
+      <h3>Recent Contributions</h3>
+      <div id="recent-list">
         <p class="empty-text">Loading...</p>
       </div>
     </div>
+
+    <a href="admin.html" class="btn-secondary">Admin Dashboard</a>
+    <button id="logout-btn" class="btn-secondary logout-space">Logout</button>
   </main>
 
   <nav class="bottom-nav">
-    <a href="dashboard.html" class="nav-item">Dashboard</a>
-    <a href="contributions.html" class="nav-item active">Contribute</a>
+    <a href="dashboard.html" class="nav-item active">Dashboard</a>
+    <a href="contributions.html" class="nav-item">Contribute</a>
     <a href="payment.html" class="nav-item">Payment</a>
     <a href="withdrawal.html" class="nav-item">Withdraw</a>
     <a href="profile.html" class="nav-item">Profile</a>
@@ -57,6 +67,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/contributions.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
