@@ -28,6 +28,7 @@ function buildDashboard() {
       "<div class='plan-card'><p class='plan-name'>Pending Withdrawals</p><p class='plan-amount' id='stat-pending'>...</p></div>" +
       "<div class='plan-card'><p class='plan-name'>Approved Withdrawals</p><p class='plan-amount' id='stat-approved'>...</p></div>" +
     "</div>" +
+    "<div class='card'><h3>Payments Awaiting Confirmation</h3><div id='admin-payment-list'><p class='empty-text'>Loading...</p></div></div>" +
     "<div class='card'><h3>Withdrawal Requests</h3><div id='admin-withdrawal-list'><p class='empty-text'>Loading...</p></div></div>" +
     "<div class='card'>" +
       "<h3>Payment Details</h3>" +
@@ -63,6 +64,7 @@ function buildDashboard() {
   loadWithdrawalRequests();
   loadPaymentDetailsForm();
   loadPlansForm();
+  loadPendingPayments();
 
   document.getElementById("admin-logout-btn").addEventListener("click", function () {
     auth.signOut().then(function () {
@@ -223,6 +225,44 @@ function loadPlansForm() {
     }).catch(function (error) {
       message.textContent = error.message;
       message.style.color = "#B00020";
+    });
+  });
+}
+
+function loadPendingPayments() {
+  const listEl = document.getElementById("admin-payment-list");
+
+  db.collection("contributions").where("status", "==", "Awaiting Confirmation").get().then(function (snapshot) {
+    if (snapshot.empty) {
+      listEl.innerHTML = "<p class='empty-text'>No payments awaiting confirmation.</p>";
+      return;
+    }
+
+    listEl.innerHTML = "";
+    snapshot.forEach(function (doc) {
+      const data = doc.data();
+      const row = document.createElement("div");
+      row.className = "admin-withdrawal-row";
+      row.innerHTML =
+        "<p><strong>" + data.planType + "</strong> — ₦" + data.amount.toLocaleString() + "</p>" +
+        "<p>Reference: " + data.transactionReference + "</p>" +
+        "<div class='admin-btn-row'>" +
+          "<button class='btn-approve' data-id='" + doc.id + "' data-action='Successful'>Confirm Paid</button>" +
+          "<button class='btn-reject' data-id='" + doc.id + "' data-action='Rejected'>Reject</button>" +
+        "</div>";
+      listEl.appendChild(row);
+    });
+
+    listEl.querySelectorAll(".btn-approve, .btn-reject").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const id = btn.getAttribute("data-id");
+        const action = btn.getAttribute("data-action");
+        db.collection("contributions").doc(id).update({
+          status: action
+        }).then(function () {
+          loadPendingPayments();
+        });
+      });
     });
   });
 }
