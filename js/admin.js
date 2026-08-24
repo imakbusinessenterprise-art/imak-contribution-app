@@ -109,12 +109,24 @@ function loadStats() {
     document.getElementById("stat-users").textContent = snapshot.size;
   });
 
-  db.collection("contributions").get().then(function (snapshot) {
+  Promise.all([
+    db.collection("contributions").get(),
+    db.collection("withdrawals").where("status", "==", "Approved").get()
+  ]).then(function (results) {
+    const contribSnap = results[0];
+    const approvedSnap = results[1];
+
     let total = 0;
-    snapshot.forEach(function (doc) {
+    contribSnap.forEach(function (doc) {
       total += doc.data().amount;
     });
-    document.getElementById("stat-contributions").textContent = "₦" + total.toLocaleString();
+
+    let approvedWithdrawn = 0;
+    approvedSnap.forEach(function (doc) {
+      approvedWithdrawn += doc.data().amount;
+    });
+
+    document.getElementById("stat-contributions").textContent = "₦" + (total - approvedWithdrawn).toLocaleString();
   });
 
   db.collection("withdrawals").where("status", "==", "Pending").get().then(function (snapshot) {
