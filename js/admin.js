@@ -23,14 +23,19 @@ function buildDashboard() {
   adminContent.innerHTML =
     "<h2>Admin Dashboard</h2>" +
     "<div class='plan-grid' id='admin-stats'>" +
-      "<div class='plan-card'><p class='plan-name'>Total Users</p><p class='plan-amount' id='stat-users'>...</p></div>" +
-      "<div class='plan-card'><p class='plan-name'>Total Contributions</p><p class='plan-amount' id='stat-contributions'>...</p></div>" +
-      "<div class='plan-card'><p class='plan-name'>Pending Withdrawals</p><p class='plan-amount' id='stat-pending'>...</p></div>" +
-      "<div class='plan-card'><p class='plan-name'>Approved Withdrawals</p><p class='plan-amount' id='stat-approved'>...</p></div>" +
+      "<button type='button' class='plan-card stat-clickable' id='stat-card-users'><p class='plan-name'>Total Users</p><p class='plan-amount' id='stat-users'>...</p></button>" +
+      "<button type='button' class='plan-card stat-clickable' id='stat-card-contributions'><p class='plan-name'>Total Contributions</p><p class='plan-amount' id='stat-contributions'>...</p></button>" +
+      "<button type='button' class='plan-card stat-clickable' id='stat-card-pending'><p class='plan-name'>Pending Withdrawals</p><p class='plan-amount' id='stat-pending'>...</p></button>" +
+      "<button type='button' class='plan-card stat-clickable' id='stat-card-approved'><p class='plan-name'>Approved Withdrawals</p><p class='plan-amount' id='stat-approved'>...</p></button>" +
     "</div>" +
-    "<div class='card'><h3>Registered Users</h3><div id='admin-users-list'><p class='empty-text'>Loading...</p></div></div>" +
+    "<div class='card' id='users-section'><h3>Registered Users</h3><div id='admin-users-list'><p class='empty-text'>Loading...</p></div></div>" +
+    "<div class='card' id='contributions-section'><h3>All Contributions</h3><div id='admin-contributions-list'><p class='empty-text'>Loading...</p></div></div>" +
     "<div class='card'><h3>Payments Awaiting Confirmation</h3><div id='admin-payment-list'><p class='empty-text'>Loading...</p></div></div>" +
-    "<div class='card'><h3>Withdrawal Requests</h3><div id='admin-withdrawal-list'><p class='empty-text'>Loading...</p></div></div>" +
+    "<div class='card' id='withdrawals-section'>" +
+      "<h3>Withdrawal Requests</h3>" +
+      "<p id='withdrawal-filter-label' class='empty-text' style='display:none;'>Showing: <span id='withdrawal-filter-name'></span> — <a href='#' id='withdrawal-clear-filter'>Show All</a></p>" +
+      "<div id='admin-withdrawal-list'><p class='empty-text'>Loading...</p></div>" +
+    "</div>" +
     "<div class='card'>" +
       "<h3>Payment Details</h3>" +
       "<form id='payment-details-form'>" +
@@ -67,11 +72,35 @@ function buildDashboard() {
   loadPlansForm();
   loadPendingPayments();
   loadUsersList();
+  loadAllContributions();
 
   document.getElementById("admin-logout-btn").addEventListener("click", function () {
     auth.signOut().then(function () {
       window.location.href = "login.html";
     });
+  });
+
+  document.getElementById("stat-card-users").addEventListener("click", function () {
+    document.getElementById("users-section").scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("stat-card-contributions").addEventListener("click", function () {
+    document.getElementById("contributions-section").scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("stat-card-pending").addEventListener("click", function () {
+    loadWithdrawalRequests("Pending");
+    document.getElementById("withdrawals-section").scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("stat-card-approved").addEventListener("click", function () {
+    loadWithdrawalRequests("Approved");
+    document.getElementById("withdrawals-section").scrollIntoView({ behavior: "smooth" });
+  });
+
+  document.getElementById("withdrawal-clear-filter").addEventListener("click", function (event) {
+    event.preventDefault();
+    loadWithdrawalRequests();
   });
 }
 
@@ -97,12 +126,26 @@ function loadStats() {
   });
 }
 
-function loadWithdrawalRequests() {
+function loadWithdrawalRequests(filterStatus) {
   const listEl = document.getElementById("admin-withdrawal-list");
+  const filterLabel = document.getElementById("withdrawal-filter-label");
+  const filterName = document.getElementById("withdrawal-filter-name");
 
-  db.collection("withdrawals").orderBy("createdAt", "desc").get().then(function (snapshot) {
+  if (filterStatus) {
+    filterLabel.style.display = "block";
+    filterName.textContent = filterStatus;
+  } else {
+    filterLabel.style.display = "none";
+  }
+
+  let query = db.collection("withdrawals").orderBy("createdAt", "desc");
+  if (filterStatus) {
+    query = db.collection("withdrawals").where("status", "==", filterStatus).orderBy("createdAt", "desc");
+  }
+
+  query.get().then(function (snapshot) {
     if (snapshot.empty) {
-      listEl.innerHTML = "<p class='empty-text'>No withdrawal requests yet.</p>";
+      listEl.innerHTML = "<p class='empty-text'>No withdrawal requests found.</p>";
       return;
     }
 
@@ -127,7 +170,7 @@ function loadWithdrawalRequests() {
       listEl.appendChild(row);
     });
 
-    document.querySelectorAll(".btn-approve, .btn-reject").forEach(function (btn) {
+    listEl.querySelectorAll(".btn-approve, .btn-reject").forEach(function (btn) {
       btn.addEventListener("click", function () {
         const id = btn.getAttribute("data-id");
         const action = btn.getAttribute("data-action");
@@ -135,7 +178,7 @@ function loadWithdrawalRequests() {
           status: action,
           reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(function () {
-          loadWithdrawalRequests();
+          loadWithdrawalRequests(filterStatus);
           loadStats();
         });
       });
@@ -302,6 +345,30 @@ function loadUsersList() {
           activityEl.textContent = contribSnap.size + " contribution(s), ₦" + total.toLocaleString() + " total";
         }
       });
+    });
+  }).catch(function (error) {
+    listEl.innerHTML = "<p class='empty-text'>" + error.message + "</p>";
+  });
+}
+
+function loadAllContributions() {
+  const listEl = document.getElementById("admin-contributions-list");
+
+  db.collection("contributions").orderBy("createdAt", "desc").get().then(function (snapshot) {
+    if (snapshot.empty) {
+      listEl.innerHTML = "<p class='empty-text'>No contributions yet.</p>";
+      return;
+    }
+
+    listEl.innerHTML = "";
+    snapshot.forEach(function (doc) {
+      const data = doc.data();
+      const row = document.createElement("div");
+      row.className = "history-row";
+      row.innerHTML =
+        "<div><strong>" + data.planType + "</strong><br><span class='history-sub'>" + data.transactionReference + "</span></div>" +
+        "<div class='history-amount'>₦" + data.amount.toLocaleString() + "<br><span class='history-status'>" + data.status + "</span></div>";
+      listEl.appendChild(row);
     });
   }).catch(function (error) {
     listEl.innerHTML = "<p class='empty-text'>" + error.message + "</p>";
