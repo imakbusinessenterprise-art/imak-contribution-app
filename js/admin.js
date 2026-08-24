@@ -28,6 +28,7 @@ function buildDashboard() {
       "<div class='plan-card'><p class='plan-name'>Pending Withdrawals</p><p class='plan-amount' id='stat-pending'>...</p></div>" +
       "<div class='plan-card'><p class='plan-name'>Approved Withdrawals</p><p class='plan-amount' id='stat-approved'>...</p></div>" +
     "</div>" +
+    "<div class='card'><h3>Registered Users</h3><div id='admin-users-list'><p class='empty-text'>Loading...</p></div></div>" +
     "<div class='card'><h3>Payments Awaiting Confirmation</h3><div id='admin-payment-list'><p class='empty-text'>Loading...</p></div></div>" +
     "<div class='card'><h3>Withdrawal Requests</h3><div id='admin-withdrawal-list'><p class='empty-text'>Loading...</p></div></div>" +
     "<div class='card'>" +
@@ -65,6 +66,7 @@ function buildDashboard() {
   loadPaymentDetailsForm();
   loadPlansForm();
   loadPendingPayments();
+  loadUsersList();
 
   document.getElementById("admin-logout-btn").addEventListener("click", function () {
     auth.signOut().then(function () {
@@ -264,6 +266,45 @@ function loadPendingPayments() {
         });
       });
     });
+  });
+}
+
+function loadUsersList() {
+  const listEl = document.getElementById("admin-users-list");
+
+  db.collection("users").orderBy("createdAt", "desc").get().then(function (snapshot) {
+    if (snapshot.empty) {
+      listEl.innerHTML = "<p class='empty-text'>No registered users yet.</p>";
+      return;
+    }
+
+    listEl.innerHTML = "";
+
+    snapshot.forEach(function (userDoc) {
+      const userData = userDoc.data();
+      const uid = userDoc.id;
+
+      const row = document.createElement("div");
+      row.className = "admin-withdrawal-row";
+      row.innerHTML =
+        "<p><strong>" + (userData.fullName || "(no name yet)") + "</strong> — " + (userData.role || "user") + "</p>" +
+        "<p>" + (userData.email || "") + " | " + (userData.phone || "no phone") + "</p>" +
+        "<p>Status: " + (userData.status || "active") + " | Activity: <span id='activity-" + uid + "'>loading...</span></p>";
+      listEl.appendChild(row);
+
+      db.collection("contributions").where("userId", "==", uid).get().then(function (contribSnap) {
+        let total = 0;
+        contribSnap.forEach(function (c) {
+          total += c.data().amount;
+        });
+        const activityEl = document.getElementById("activity-" + uid);
+        if (activityEl) {
+          activityEl.textContent = contribSnap.size + " contribution(s), ₦" + total.toLocaleString() + " total";
+        }
+      });
+    });
+  }).catch(function (error) {
+    listEl.innerHTML = "<p class='empty-text'>" + error.message + "</p>";
   });
 }
 
