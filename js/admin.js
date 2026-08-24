@@ -326,6 +326,7 @@ function loadPendingPayments() {
 
 function loadUsersList() {
   const listEl = document.getElementById("admin-users-list");
+  const currentUid = auth.currentUser ? auth.currentUser.uid : null;
 
   db.collection("users").orderBy("createdAt", "desc").get().then(function (snapshot) {
     if (snapshot.empty) {
@@ -338,13 +339,24 @@ function loadUsersList() {
     snapshot.forEach(function (userDoc) {
       const userData = userDoc.data();
       const uid = userDoc.id;
+      const isCurrentAdmin = userData.role === "admin";
+
+      let roleButton = "";
+      if (uid === currentUid) {
+        roleButton = "<span class='history-sub'>(this is you)</span>";
+      } else if (isCurrentAdmin) {
+        roleButton = "<button class='btn-reject' data-uid='" + uid + "' data-newrole='user'>Remove Admin</button>";
+      } else {
+        roleButton = "<button class='btn-approve' data-uid='" + uid + "' data-newrole='admin'>Make Admin</button>";
+      }
 
       const row = document.createElement("div");
       row.className = "admin-withdrawal-row";
       row.innerHTML =
         "<p><strong>" + (userData.fullName || "(no name yet)") + "</strong> — " + (userData.role || "user") + "</p>" +
         "<p>" + (userData.email || "") + " | " + (userData.phone || "no phone") + "</p>" +
-        "<p>Status: " + (userData.status || "active") + " | Activity: <span id='activity-" + uid + "'>loading...</span></p>";
+        "<p>Status: " + (userData.status || "active") + " | Activity: <span id='activity-" + uid + "'>loading...</span></p>" +
+        "<div class='admin-btn-row'>" + roleButton + "</div>";
       listEl.appendChild(row);
 
       db.collection("contributions").where("userId", "==", uid).get().then(function (contribSnap) {
@@ -356,6 +368,24 @@ function loadUsersList() {
         if (activityEl) {
           activityEl.textContent = contribSnap.size + " contribution(s), ₦" + total.toLocaleString() + " total";
         }
+      });
+    });
+
+    listEl.querySelectorAll("[data-newrole]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const uid = btn.getAttribute("data-uid");
+        const newRole = btn.getAttribute("data-newrole");
+        const confirmMsg = newRole === "admin"
+          ? "Give this user admin access?"
+          : "Remove admin access from this user?";
+
+        if (!confirm(confirmMsg)) return;
+
+        db.collection("users").doc(uid).update({ role: newRole }).then(function () {
+          loadUsersList();
+        }).catch(function (error) {
+          alert(error.message);
+        });
       });
     });
   }).catch(function (error) {
