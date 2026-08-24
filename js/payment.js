@@ -1,4 +1,4 @@
-// Demo/test payment page — reads a contribution ID from the URL and simulates payment
+// Real payment confirmation page — reads a contribution ID from the URL, shows bank details, and lets the user notify us they've paid
 
 function getContributionId() {
   const params = new URLSearchParams(window.location.search);
@@ -49,7 +49,13 @@ function loadContribution() {
 
       if (data.status === "Successful") {
         simulateBtn.disabled = true;
-        simulateBtn.textContent = "Payment Already Completed";
+        simulateBtn.textContent = "Payment Confirmed";
+      } else if (data.status === "Awaiting Confirmation") {
+        simulateBtn.disabled = true;
+        simulateBtn.textContent = "Awaiting Confirmation";
+      } else if (data.status === "Rejected") {
+        simulateBtn.disabled = true;
+        simulateBtn.textContent = "Payment Rejected — Contact Admin";
       }
     })
     .catch(function (error) {
@@ -62,15 +68,15 @@ if (simulateBtn) {
     if (!contributionId) return;
 
     simulateBtn.disabled = true;
-    paymentMessageEl.textContent = "Processing demo payment...";
+    paymentMessageEl.textContent = "Notifying us of your payment...";
     paymentMessageEl.style.color = "#555";
 
     db.collection("contributions").doc(contributionId).update({
-      status: "Successful"
+      status: "Awaiting Confirmation"
     }).then(function () {
-      paymentMessageEl.textContent = "Payment successful! (Demo transaction — no real money was transferred.)";
+      paymentMessageEl.textContent = "Thanks! We'll confirm your payment shortly once we've checked our account.";
       paymentMessageEl.style.color = "#0B4D2C";
-      simulateBtn.textContent = "Payment Already Completed";
+      simulateBtn.textContent = "Awaiting Confirmation";
       loadContribution();
     }).catch(function (error) {
       paymentMessageEl.textContent = error.message;
