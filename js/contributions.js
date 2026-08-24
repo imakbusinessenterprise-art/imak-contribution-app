@@ -95,7 +95,7 @@ if (contributionForm) {
       planType: selectedPlan,
       amount: amount,
       status: "Pending",
-      transactionReference: "DEMO-" + Date.now(),
+      transactionReference: "TXN-" + Date.now(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(function (docRef) {
       message.textContent = "Contribution saved! Redirecting to payment...";
