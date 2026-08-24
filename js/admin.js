@@ -170,8 +170,8 @@ function loadWithdrawalRequests(filterStatus) {
       let buttons = "";
       if (data.status === "Pending") {
         buttons =
-          "<button class='btn-approve' data-id='" + doc.id + "' data-action='Approved'>Approve</button>" +
-          "<button class='btn-reject' data-id='" + doc.id + "' data-action='Rejected'>Reject</button>";
+          "<button class='btn-approve' data-id='" + doc.id + "' data-action='Approved' data-userid='" + data.userId + "' data-amount='" + data.amount + "'>Approve</button>" +
+          "<button class='btn-reject' data-id='" + doc.id + "' data-action='Rejected' data-userid='" + data.userId + "' data-amount='" + data.amount + "'>Reject</button>";
       }
 
       row.innerHTML =
@@ -186,9 +186,23 @@ function loadWithdrawalRequests(filterStatus) {
       btn.addEventListener("click", function () {
         const id = btn.getAttribute("data-id");
         const action = btn.getAttribute("data-action");
+        const targetUserId = btn.getAttribute("data-userid");
+        const amount = Number(btn.getAttribute("data-amount"));
+
         db.collection("withdrawals").doc(id).update({
           status: action,
           reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function () {
+          const notifMessage = action === "Approved"
+            ? "Your withdrawal request of ₦" + amount.toLocaleString() + " has been approved."
+            : "Your withdrawal request of ₦" + amount.toLocaleString() + " was rejected. Please contact admin.";
+
+          return db.collection("notifications").add({
+            userId: targetUserId,
+            message: notifMessage,
+            read: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
         }).then(function () {
           loadWithdrawalRequests(filterStatus);
           loadStats();
@@ -304,8 +318,8 @@ function loadPendingPayments() {
         "<p><strong>" + data.planType + "</strong> — ₦" + data.amount.toLocaleString() + "</p>" +
         "<p>Reference: " + data.transactionReference + "</p>" +
         "<div class='admin-btn-row'>" +
-          "<button class='btn-approve' data-id='" + doc.id + "' data-action='Successful'>Confirm Paid</button>" +
-          "<button class='btn-reject' data-id='" + doc.id + "' data-action='Rejected'>Reject</button>" +
+          "<button class='btn-approve' data-id='" + doc.id + "' data-action='Successful' data-userid='" + data.userId + "' data-amount='" + data.amount + "' data-plantype='" + data.planType + "'>Confirm Paid</button>" +
+          "<button class='btn-reject' data-id='" + doc.id + "' data-action='Rejected' data-userid='" + data.userId + "' data-amount='" + data.amount + "' data-plantype='" + data.planType + "'>Reject</button>" +
         "</div>";
       listEl.appendChild(row);
     });
@@ -314,8 +328,23 @@ function loadPendingPayments() {
       btn.addEventListener("click", function () {
         const id = btn.getAttribute("data-id");
         const action = btn.getAttribute("data-action");
+        const targetUserId = btn.getAttribute("data-userid");
+        const amount = Number(btn.getAttribute("data-amount"));
+        const planType = btn.getAttribute("data-plantype");
+
         db.collection("contributions").doc(id).update({
           status: action
+        }).then(function () {
+          const notifMessage = action === "Successful"
+            ? "Your payment of ₦" + amount.toLocaleString() + " (" + planType + ") has been confirmed."
+            : "Your payment of ₦" + amount.toLocaleString() + " (" + planType + ") was rejected. Please contact admin.";
+
+          return db.collection("notifications").add({
+            userId: targetUserId,
+            message: notifMessage,
+            read: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
         }).then(function () {
           loadPendingPayments();
         });
