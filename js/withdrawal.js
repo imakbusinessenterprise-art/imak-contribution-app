@@ -7,20 +7,28 @@ const balanceSubtitle = document.getElementById("balance-subtitle");
 let currentBalance = 0;
 
 function loadBalance(user) {
-  db.collection("contributions")
-    .where("userId", "==", user.uid)
-    .get()
-    .then(function (snapshot) {
-      let total = 0;
-      snapshot.forEach(function (doc) {
-        total += doc.data().amount;
-      });
-      currentBalance = total;
-      balanceSubtitle.textContent = "Available balance: ₦" + total.toLocaleString();
-    })
-    .catch(function (error) {
-      balanceSubtitle.textContent = "Could not load balance.";
+  Promise.all([
+    db.collection("contributions").where("userId", "==", user.uid).get(),
+    db.collection("withdrawals").where("userId", "==", user.uid).where("status", "in", ["Pending", "Approved"]).get()
+  ]).then(function (results) {
+    const contribSnap = results[0];
+    const withdrawSnap = results[1];
+
+    let total = 0;
+    contribSnap.forEach(function (doc) {
+      total += doc.data().amount;
     });
+
+    let withdrawn = 0;
+    withdrawSnap.forEach(function (doc) {
+      withdrawn += doc.data().amount;
+    });
+
+    currentBalance = total - withdrawn;
+    balanceSubtitle.textContent = "Available balance: ₦" + currentBalance.toLocaleString();
+  }).catch(function (error) {
+    balanceSubtitle.textContent = "Could not load balance.";
+  });
 }
 
 if (withdrawalForm) {
@@ -70,6 +78,7 @@ if (withdrawalForm) {
       message.style.color = "#0B4D2C";
       withdrawalForm.reset();
       loadWithdrawalHistory(user);
+      loadBalance(user);
     }).catch(function (error) {
       message.textContent = error.message;
       message.style.color = "#B00020";
