@@ -19,8 +19,40 @@ function attachPlanButtonEvents() {
       selectedPlan = btn.getAttribute("data-plan");
       selectedMin = Number(btn.getAttribute("data-min"));
       selectedPlanText.textContent = "Selected plan: " + selectedPlan + " (minimum ₦" + selectedMin.toLocaleString() + ")";
+
+      const suggestedRaw = btn.getAttribute("data-suggested") || "";
+      const suggested = suggestedRaw.split(",").map(Number).filter(function (n) { return n > 0; });
+      renderAmountOptions(suggested);
     });
   });
+}
+
+function renderAmountOptions(amounts) {
+  const grid = document.getElementById("amount-options-grid");
+  const amountInput = document.getElementById("amount");
+
+  if (!amounts || amounts.length === 0) {
+    grid.style.display = "none";
+    grid.innerHTML = "";
+    return;
+  }
+
+  grid.innerHTML = "";
+  amounts.forEach(function (amt) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "plan-option";
+    btn.innerHTML = "<span class='plan-option-name'>₦" + amt.toLocaleString() + "</span>";
+    btn.addEventListener("click", function () {
+      amountInput.value = amt;
+      grid.querySelectorAll(".plan-option").forEach(function (b) {
+        b.classList.remove("plan-option-selected");
+      });
+      btn.classList.add("plan-option-selected");
+    });
+    grid.appendChild(btn);
+  });
+  grid.style.display = "grid";
 }
 
 function loadPlans() {
@@ -40,6 +72,7 @@ function loadPlans() {
       btn.className = "plan-option";
       btn.setAttribute("data-plan", data.name);
       btn.setAttribute("data-min", data.minimumAmount);
+      btn.setAttribute("data-suggested", data.suggestedAmounts ? data.suggestedAmounts.join(",") : "");
       btn.innerHTML =
         "<span class='plan-option-name'>" + data.name + "</span>" +
         "<span class='plan-option-min'>Min ₦" + data.minimumAmount.toLocaleString() + "</span>";
