@@ -56,10 +56,16 @@ function buildDashboard() {
       "<form id='plans-form'>" +
         "<label for='plan-daily-min'>Daily Plan — Minimum (₦)</label>" +
         "<input type='number' id='plan-daily-min' required>" +
+        "<label for='plan-daily-suggested'>Daily — Suggested Amounts (comma-separated)</label>" +
+        "<input type='text' id='plan-daily-suggested' placeholder='e.g. 1000, 2000, 5000'>" +
         "<label for='plan-weekly-min'>Weekly Plan — Minimum (₦)</label>" +
         "<input type='number' id='plan-weekly-min' required>" +
+        "<label for='plan-weekly-suggested'>Weekly — Suggested Amounts (comma-separated)</label>" +
+        "<input type='text' id='plan-weekly-suggested' placeholder='e.g. 2000, 5000, 10000'>" +
         "<label for='plan-monthly-min'>Monthly Plan — Minimum (₦)</label>" +
         "<input type='number' id='plan-monthly-min' required>" +
+        "<label for='plan-monthly-suggested'>Monthly — Suggested Amounts (comma-separated)</label>" +
+        "<input type='text' id='plan-monthly-suggested' placeholder='e.g. 5000, 10000, 20000'>" +
         "<p id='plans-message' class='form-message'></p>" +
         "<button type='submit' class='btn-primary'>Save Plans</button>" +
       "</form>" +
@@ -264,15 +270,24 @@ function loadPaymentDetailsForm() {
   });
 }
 
+function parseSuggestedAmounts(text) {
+  return text.split(",")
+    .map(function (s) { return Number(s.trim()); })
+    .filter(function (n) { return n > 0; });
+}
+
 function loadPlansForm() {
   db.collection("plans").doc("daily").get().then(function (doc) {
     document.getElementById("plan-daily-min").value = doc.exists ? doc.data().minimumAmount : 500;
+    document.getElementById("plan-daily-suggested").value = doc.exists && doc.data().suggestedAmounts ? doc.data().suggestedAmounts.join(", ") : "500, 1000, 2000";
   });
   db.collection("plans").doc("weekly").get().then(function (doc) {
     document.getElementById("plan-weekly-min").value = doc.exists ? doc.data().minimumAmount : 2000;
+    document.getElementById("plan-weekly-suggested").value = doc.exists && doc.data().suggestedAmounts ? doc.data().suggestedAmounts.join(", ") : "2000, 5000, 10000";
   });
   db.collection("plans").doc("monthly").get().then(function (doc) {
     document.getElementById("plan-monthly-min").value = doc.exists ? doc.data().minimumAmount : 5000;
+    document.getElementById("plan-monthly-suggested").value = doc.exists && doc.data().suggestedAmounts ? doc.data().suggestedAmounts.join(", ") : "5000, 10000, 20000";
   });
 
   document.getElementById("plans-form").addEventListener("submit", function (event) {
@@ -283,13 +298,17 @@ function loadPlansForm() {
     const weeklyMin = Number(document.getElementById("plan-weekly-min").value);
     const monthlyMin = Number(document.getElementById("plan-monthly-min").value);
 
+    const dailySuggested = parseSuggestedAmounts(document.getElementById("plan-daily-suggested").value);
+    const weeklySuggested = parseSuggestedAmounts(document.getElementById("plan-weekly-suggested").value);
+    const monthlySuggested = parseSuggestedAmounts(document.getElementById("plan-monthly-suggested").value);
+
     message.textContent = "Saving...";
     message.style.color = "#555";
 
     Promise.all([
-      db.collection("plans").doc("daily").set({ name: "Daily", frequency: "daily", minimumAmount: dailyMin, status: "active" }, { merge: true }),
-      db.collection("plans").doc("weekly").set({ name: "Weekly", frequency: "weekly", minimumAmount: weeklyMin, status: "active" }, { merge: true }),
-      db.collection("plans").doc("monthly").set({ name: "Monthly", frequency: "monthly", minimumAmount: monthlyMin, status: "active" }, { merge: true })
+      db.collection("plans").doc("daily").set({ name: "Daily", frequency: "daily", minimumAmount: dailyMin, suggestedAmounts: dailySuggested, status: "active" }, { merge: true }),
+      db.collection("plans").doc("weekly").set({ name: "Weekly", frequency: "weekly", minimumAmount: weeklyMin, suggestedAmounts: weeklySuggested, status: "active" }, { merge: true }),
+      db.collection("plans").doc("monthly").set({ name: "Monthly", frequency: "monthly", minimumAmount: monthlyMin, suggestedAmounts: monthlySuggested, status: "active" }, { merge: true })
     ]).then(function () {
       message.textContent = "Plans saved!";
       message.style.color = "#0B4D2C";
