@@ -28,6 +28,7 @@ function buildDashboard() {
       "<button type='button' class='plan-card stat-clickable' id='stat-card-pending'><p class='plan-name'>Pending Withdrawals</p><p class='plan-amount' id='stat-pending'>...</p></button>" +
       "<button type='button' class='plan-card stat-clickable' id='stat-card-approved'><p class='plan-name'>Approved Withdrawals</p><p class='plan-amount' id='stat-approved'>...</p></button>" +
     "</div>" +
+    "<div class='card'><h3>Support Messages</h3><div id='admin-support-list'><p class='empty-text'>Loading...</p></div></div>" +
     "<div class='card' id='users-section'><h3>Registered Users</h3><div id='admin-users-list'><p class='empty-text'>Loading...</p></div></div>" +
     "<div class='card' id='contributions-section'><h3>All Contributions</h3><div id='admin-contributions-list'><p class='empty-text'>Loading...</p></div></div>" +
     "<div class='card'><h3>Payments Awaiting Confirmation</h3><div id='admin-payment-list'><p class='empty-text'>Loading...</p></div></div>" +
@@ -79,6 +80,7 @@ function buildDashboard() {
   loadPendingPayments();
   loadUsersList();
   loadAllContributions();
+  loadSupportThreads();
 
   document.getElementById("admin-logout-btn").addEventListener("click", function () {
     auth.signOut().then(function () {
@@ -458,6 +460,34 @@ function loadAllContributions() {
       row.innerHTML =
         "<div><strong>" + data.planType + "</strong><br><span class='history-sub'>" + data.transactionReference + "</span></div>" +
         "<div class='history-amount'>₦" + data.amount.toLocaleString() + "<br><span class='history-status'>" + data.status + "</span></div>";
+      listEl.appendChild(row);
+    });
+  }).catch(function (error) {
+    listEl.innerHTML = "<p class='empty-text'>" + error.message + "</p>";
+  });
+}
+
+function loadSupportThreads() {
+  const listEl = document.getElementById("admin-support-list");
+
+  db.collection("supportThreads").orderBy("lastMessageAt", "desc").get().then(function (snapshot) {
+    if (snapshot.empty) {
+      listEl.innerHTML = "<p class='empty-text'>No support messages yet.</p>";
+      return;
+    }
+
+    listEl.innerHTML = "";
+    snapshot.forEach(function (doc) {
+      const data = doc.data();
+      const row = document.createElement("a");
+      row.href = "admin-chat.html?uid=" + doc.id;
+      row.className = "admin-withdrawal-row";
+      row.style.display = "block";
+      row.style.textDecoration = "none";
+      row.style.color = "inherit";
+      row.innerHTML =
+        "<p><strong>" + (data.userName || doc.id) + "</strong>" + (data.unreadByAdmin ? " <span class='notif-badge' style='position:static;display:inline-block;'>New</span>" : "") + "</p>" +
+        "<p class='history-sub'>" + (data.lastMessage || "") + "</p>";
       listEl.appendChild(row);
     });
   }).catch(function (error) {
